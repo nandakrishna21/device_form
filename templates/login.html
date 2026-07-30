@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - ESSL Device Manager</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .login-box { background: white; padding: 2.5rem; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); width: 380px; }
+        h1 { font-size: 1.5rem; color: #1a1a2e; margin-bottom: 0.25rem; }
+        .subtitle { color: #666; font-size: 0.875rem; margin-bottom: 1.5rem; }
+        .flash { padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.875rem; }
+        .flash.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; font-weight: 600; font-size: 0.875rem; color: #333; margin-bottom: 0.25rem; }
+        input { width: 100%; padding: 0.75rem; border: 1px solid #ccc; border-radius: 6px; font-size: 0.875rem; }
+        input:focus { outline: none; border-color: #4a6cf7; box-shadow: 0 0 0 3px rgba(74,108,247,0.15); }
+        button { width: 100%; padding: 0.75rem; background: #1a1a2e; color: white; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+        button:hover { background: #2d2d4e; }
+        .hint { margin-top: 1rem; font-size: 0.75rem; color: #999; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h1>Device Manager</h1>
+        <p class="subtitle">Enter password to continue</p>
+
+        {% if error %}
+            <div class="flash error">{{ error }}</div>
+        {% endif %}
+
+        <form method="POST">
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" placeholder="Enter password" required autofocus>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+        <p class="hint">ESSL Device Management System</p>
+    </div>
+</body>
+</html>

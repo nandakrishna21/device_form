@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add ESSL Device</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 520px; }
+        h1 { font-size: 1.5rem; color: #1a1a2e; margin-bottom: 0.25rem; }
+        .subtitle { color: #666; font-size: 0.875rem; margin-bottom: 1.5rem; }
+        .flash { padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.875rem; }
+        .flash.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .flash.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .flash.warning { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; font-weight: 600; font-size: 0.875rem; color: #333; margin-bottom: 0.25rem; }
+        label .required { color: #dc3545; }
+        input, select { width: 100%; padding: 0.625rem; border: 1px solid #ccc; border-radius: 6px; font-size: 0.875rem; }
+        input:focus, select:focus { outline: none; border-color: #4a6cf7; box-shadow: 0 0 0 3px rgba(74,108,247,0.15); }
+        .form-row { display: flex; gap: 1rem; }
+        .form-row .form-group { flex: 1; }
+        button { width: 100%; padding: 0.75rem; background: #1a1a2e; color: white; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 0.5rem; }
+        button:hover { background: #2d2d4e; }
+        .note { margin-top: 1rem; font-size: 0.75rem; color: #999; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Add New ESSL Device</h1>
+        <p class="subtitle" style="display:flex;justify-content:space-between;align-items:center;">
+            Insert device record directly into eTimetracklite1
+            <span>
+                <a href="{{ url_for('device_list') }}" style="font-size:0.8125rem;color:#4a6cf7;text-decoration:none;font-weight:600;margin-right:0.75rem;">View All Devices &rarr;</a>
+                <a href="{{ url_for('logout') }}" style="font-size:0.8125rem;color:#dc3545;text-decoration:none;font-weight:600;">Logout</a>
+            </span>
+        </p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Device Name (FName) <span class="required">*</span></label>
+                    <input type="text" name="DeviceFName" placeholder="e.g. FrontDoor" required>
+                </div>
+                <div class="form-group">
+                    <label>Device Name (SName)</label>
+                    <input type="text" name="DeviceSName" placeholder="e.g. Main_Office">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Serial Number <span class="required">*</span></label>
+                    <input type="text" name="SerialNumber" placeholder="e.g. ESS2101234567" required>
+                </div>
+                <div class="form-group">
+                    <label>IP Address <span class="required">*</span></label>
+                    <input type="text" name="IpAddress" placeholder="e.g. 192.168.1.200" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Connection Type</label>
+                    <select name="ConnectionType">
+                        <option value="Tcp/IP">Tcp/IP</option>
+                        <option value="TCP/IP">TCP/IP</option>
+                        <option value="Serial">Serial</option>
+                        <option value="USB">USB</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Baud Rate</label>
+                    <input type="text" name="BaudRate" placeholder="115200" value="115200">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Direction</label>
+                    <select name="DeviceDirection">
+                        <option value="altinout">altinout</option>
+                        <option value="entry">entry</option>
+                        <option value="exit">exit</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Device Type</label>
+                    <select name="DeviceType">
+                        <option value="Attendance">Attendance</option>
+                        <option value="Normal">Normal</option>
+                        <option value="Canteen">Canteen</option>
+                        <option value="Access Control">Access Control</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Timezone</label>
+                    <input type="text" name="Timezone" placeholder="330" value="330">
+                </div>
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" name="DeviceLocation" placeholder="e.g. Salem">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Comm Key</label>
+                <input type="text" name="CommKey" placeholder="0" value="0">
+            </div>
+
+            <button type="submit">Add Device</button>
+        </form>
+
+        <p class="note">Server: {{ DB_CONFIG.server }} &middot; Database: {{ DB_CONFIG.database }}</p>
+    </div>
+</body>
+</html>

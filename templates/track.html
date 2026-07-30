@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aswins_HO - HRMS Portal</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { width: 100vw; min-height: 100vh; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; background: #f0f2f5; overflow-x: hidden; }
+        body { display: flex; flex-direction: column; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; }
+        .top-bar.light { background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+        .top-bar.dark { background: linear-gradient(135deg, #0f172a, #1e293b); color: white; }
+        .top-bar h1 { font-size: 1.1rem; }
+        .top-bar h1 span { color: #3b82f6; }
+        .top-right { display: flex; align-items: center; gap: 12px; }
+        .top-right .update-time { color: #64748b; font-size: 0.7rem; }
+        .top-right .update-time.dim { color: #94a3b8; }
+        .layout { display: flex; flex: 1; min-height: calc(100vh - 46px); }
+        .sidebar { width: 220px; background: linear-gradient(180deg, #0f172a, #1e293b); padding: 16px 0; display: flex; flex-direction: column; flex-shrink: 0; }
+        .sidebar .brand { padding: 0 16px 16px; border-bottom: 1px solid #334155; margin-bottom: 8px; }
+        .sidebar .brand .name { color: white; font-size: 0.95rem; font-weight: 700; }
+        .sidebar .brand .sub { color: #64748b; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+        .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; color: #94a3b8; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s; border-left: 3px solid transparent; text-decoration: none; }
+        .nav-item:hover { background: #1e293b; color: #e2e8f0; }
+        .nav-item.active { background: #1e293b; color: white; border-left-color: #3b82f6; }
+        .nav-item .icon { font-size: 1.1rem; width: 20px; text-align: center; }
+        .sidebar-footer { margin-top: auto; padding: 12px 16px; border-top: 1px solid #334155; }
+        .sidebar-footer a { color: #64748b; font-size: 0.75rem; text-decoration: none; }
+        .sidebar-footer a:hover { color: #f87171; }
+        .content { flex: 1; padding: 16px 20px; overflow-y: auto; }
+        .welcome-card { background: linear-gradient(135deg, #1e40af, #3b82f6); color: white; border-radius: 12px; padding: 24px; margin-bottom: 16px; }
+        .welcome-card h2 { font-size: 1.3rem; font-weight: 700; }
+        .welcome-card p { color: #bfdbfe; font-size: 0.85rem; margin-top: 4px; }
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; }
+        .info-card { background: white; border-radius: 10px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+        .info-card .label { font-size: 0.7rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+        .info-card .value { font-size: 1.5rem; font-weight: 700; color: #0f172a; margin-top: 4px; }
+        .info-card .sub { font-size: 0.75rem; color: #94a3b8; margin-top: 2px; }
+        .emp-grid { background: white; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); overflow: hidden; }
+        .emp-grid .header { padding: 12px 16px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+        .emp-grid .header h3 { font-size: 0.9rem; color: #0f172a; }
+        .emp-grid .header input { padding: 6px 10px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 0.8rem; outline: none; width: 200px; }
+        .emp-grid .header input:focus { border-color: #3b82f6; }
+        .emp-table { width: 100%; border-collapse: collapse; }
+        .emp-table th { background: #f8fafc; color: #64748b; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; padding: 8px 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        .emp-table td { padding: 8px 12px; border-bottom: 1px solid #f1f5f9; font-size: 0.8rem; color: #334155; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; }
+        .badge-green { background: #d1fae5; color: #059669; }
+        .badge-red { background: #fee2e2; color: #dc2626; }
+        .badge-blue { background: #dbeafe; color: #2563eb; }
+        .hidden { display: none; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+        .cal-grid .day { background: white; border-radius: 6px; padding: 8px; text-align: center; font-size: 0.8rem; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+        .cal-grid .day .num { font-weight: 600; color: #0f172a; font-size: 0.9rem; }
+        .cal-grid .day .event { font-size: 0.65rem; color: #3b82f6; margin-top: 2px; }
+        .cal-grid .day.today { background: #3b82f6; color: white; }
+        .cal-grid .day.today .num { color: white; }
+        .cal-grid .day.today .event { color: #bfdbfe; }
+        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .cal-header h3 { font-size: 1rem; color: #0f172a; }
+        .cal-header span { color: #64748b; font-size: 0.85rem; }
+        .empty-state { text-align: center; padding: 40px; color: #94a3b8; }
+        .empty-state .icon { font-size: 2.5rem; margin-bottom: 8px; }
+        .empty-state .text { font-size: 0.9rem; }
+        .hr-card { background: white; border-radius: 10px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: 12px; }
+        .hr-card h4 { font-size: 0.85rem; color: #0f172a; margin-bottom: 8px; }
+        .hr-stat { display: flex; gap: 12px; flex-wrap: wrap; }
+        .hr-stat-item { flex: 1; min-width: 120px; padding: 12px; background: #f8fafc; border-radius: 8px; text-align: center; }
+        .hr-stat-item .num { font-size: 1.3rem; font-weight: 700; color: #0f172a; }
+        .hr-stat-item .lbl { font-size: 0.7rem; color: #64748b; margin-top: 2px; }
+        .device-badge { background: #1e293b; color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+        .device-badge .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        .dot-green { background: #10b981; }
+        .dot-red { background: #ef4444; }
+        @media (max-width: 768px) {
+            .sidebar { width: 56px; }
+            .sidebar .brand .sub, .sidebar .nav-item span:last-child, .sidebar-footer span { display: none; }
+            .nav-item { justify-content: center; padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar {% if is_admin %}dark{% else %}light{% endif %}">
+        <h1>Aswins_HO <span>{% if logged_in %}{% if is_admin %}Admin{% else %}Live Attendance{% endif %}{% else %}Sign In{% endif %}</span></h1>
+        <div class="top-right">
+            {% if logged_in %}
+            <span class="update-time {% if is_admin %}dim{% endif %}">Updated: <span id="update-time">--</span></span>
+            <a href="/track/aswins-ho?logout=1" style="color:#f87171;text-decoration:none;font-weight:600;font-size:0.85rem;">Sign Out</a>
+            {% endif %}
+        </div>
+    </div>
+
+{% if not logged_in %}
+<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;padding:1rem;background:linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);position:relative;overflow:hidden;">
+    <div style="position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 30% 40%, rgba(59,130,246,0.08) 0%, transparent 50%),radial-gradient(circle at 70% 60%, rgba(16,185,129,0.05) 0%, transparent 50%);pointer-events:none;"></div>
+    <div style="background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);border-radius:24px;padding:3rem 2.5rem 2.5rem;width:420px;box-shadow:0 25px 80px rgba(0,0,0,0.5);position:relative;z-index:1;text-align:center;">
+        <div style="width:72px;height:72px;background:linear-gradient(135deg,#1e40af,#3b82f6);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;box-shadow:0 8px 24px rgba(59,130,246,0.3);">
+            <i class="fa-solid fa-fingerprint" style="font-size:32px;color:white;"></i>
+        </div>
+        <div style="font-size:1.6rem;font-weight:800;color:#0f172a;letter-spacing:-0.5px;margin-bottom:2px;">Aswins_HO</div>
+        <div style="color:#64748b;font-size:0.85rem;margin-bottom:24px;font-weight:500;">Human Resource Management System</div>
+        {% if error %}
+        <div style="background:#fef2f2;color:#dc2626;padding:10px 14px;border-radius:10px;font-size:0.85rem;margin-bottom:18px;border:1px solid #fecaca;text-align:left;display:flex;align-items:center;gap:8px;">
+            <span style="font-size:1.1rem;">&#9888;</span> {{ error }}</div>
+        {% endif %}
+        <form method="POST" action="/track/aswins-ho">
+            <div style="position:relative;margin-bottom:14px;">
+                <div style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:1rem;">&#9783;</div>
+                <input type="text" name="username" placeholder="Username" required
+                       style="width:100%;padding:12px 14px 12px 40px;border:2px solid #e2e8f0;border-radius:12px;font-size:0.9rem;outline:none;transition:all 0.2s;background:#f8fafc;"
+                       onfocus="this.style.borderColor='#3b82f6';this.style.background='white';this.style.boxShadow='0 0 0 4px rgba(59,130,246,0.1)'"
+                       onblur="this.style.borderColor='#e2e8f0';this.style.background='#f8fafc';this.style.boxShadow='none'">
+            </div>
+            <div style="position:relative;margin-bottom:6px;">
+                <div style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:1rem;">&#9679;</div>
+                <input type="password" name="password" placeholder="Password" required
+                       style="width:100%;padding:12px 14px 12px 40px;border:2px solid #e2e8f0;border-radius:12px;font-size:0.9rem;outline:none;transition:all 0.2s;background:#f8fafc;"
+                       onfocus="this.style.borderColor='#3b82f6';this.style.background='white';this.style.boxShadow='0 0 0 4px rgba(59,130,246,0.1)'"
+                       onblur="this.style.borderColor='#e2e8f0';this.style.background='#f8fafc';this.style.boxShadow='none'">
+            </div>
+            <div style="text-align:right;margin-bottom:20px;">
+                <a href="#" onclick="alert('Contact your administrator to reset your password.');return false;" style="color:#64748b;font-size:0.8rem;text-decoration:none;font-weight:500;">Forgot Password?</a>
+            </div>
+            <button type="submit" style="width:100%;padding:12px;background:linear-gradient(135deg,#1e40af,#3b82f6);color:white;border:none;border-radius:12px;font-size:1rem;font-weight:700;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 16px rgba(59,130,246,0.4);letter-spacing:0.3px;"
+                    onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 24px rgba(59,130,246,0.5)'"
+                    onmouseout="this.style.transform='none';this.style.boxShadow='0 4px 16px rgba(59,130,246,0.4)'">
+                Sign In
+            </button>
+        </form>
+        <div style="margin-top:20px;padding-top:18px;border-top:1px solid #e2e8f0;display:flex;justify-content:center;gap:16px;">
+            <div style="display:flex;align-items:center;gap:6px;color:#94a3b8;font-size:0.75rem;">
+                <span style="width:8px;height:8px;border-radius:50%;background:#10b981;display:inline-block;"></span> Biometric
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;color:#94a3b8;font-size:0.75rem;">
+                <span style="width:8px;height:8px;border-radius:50%;background:#3b82f6;display:inline-block;"></span> Cloud HRMS
+            </div>
+        </div>
+    </div>
+</div>
+{% elif is_admin %}
+<div class="layout">
+    <div class="sidebar">
+        <div class="brand">
+            <div class="name">Aswins_HO</div>
+            <div class="sub">Admin Portal</div>
+        </div>
+        <div class="nav-item active" data-page="dashboard" onclick="showPage('dashboard', this)">
+            <span class="icon">&#9632;</span>
+            <span>Dashboard</span>
+        </div>
+        <div class="nav-item" data-page="employees" onclick="showPage('employees', this)">
+            <span class="icon">&#9644;</span>
+            <span>Employees</span>
+        </div>
+        <div class="nav-item" data-page="calendar" onclick="showPage('calendar', this)">
+            <span class="icon">&#9746;</span>
+            <span>Calendar</span>
+        </div>
+        <div class="nav-item" data-page="admin" onclick="showPage('admin', this)">
+            <span class="icon">&#9733;</span>
+            <span>Admin</span>
+        </div>
+        <div class="sidebar-footer">
+            <a href="/track/aswins-ho?logout=1" style="color:white;">&#8592; Sign Out</a>
+        </div>
+    </div>
+    <div class="content">
+        <div id="page-dashboard" class="page active">
+            <div class="welcome-card">
+                <h2>Welcome, {{ session.get('track_user', 'Admin') }}</h2>
+                <p>You are logged in as Administrator &middot; Aswins_HO</p>
+            </div>
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="label">Device</div>
+                    <div class="value" id="dev-name">{{ device.DeviceFName }}</div>
+                    <div class="sub">Serial: {{ device.SerialNumber }}</div>
+                </div>
+                <div class="info-card">
+                    <div class="label">Status</div>
+                    <div class="value" id="admin-dev-status">
+                        <span class="device-badge"><span class="dot {% if device.is_online %}dot-green{% else %}dot-red{% endif %}"></span>{% if device.is_online %}Online{% else %}Offline{% endif %}</span>
+                    </div>
+                    <div class="sub" id="admin-last-ping">{{ device.last_ping_ago or 'No connection yet' }}</div>
+                </div>
+                <div class="info-card">
+                    <div class="label">Total Employees</div>
+                    <div class="value" id="admin-total-emp">0</div>
+                    <div class="sub">Registered in system</div>
+                </div>
+                <div class="info-card">
+                    <div class="label">Location</div>
+                    <div class="value">Client Place</div>
+                    <div class="sub">IP: {{ device.IpAddress }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-employees" class="page">
+            <div class="emp-grid">
+                <div class="header">
+                    <h3>Employee Directory</h3>
+                    <input type="text" id="admin-search" placeholder="Search by name or ID..." oninput="filterAdminEmployees()">
+                </div>
+                <table class="emp-table">
+                    <thead><tr><th>ID</th><th>Name</th><th>Status</th><th>Last Punch</th><th>Punches Today</th></tr></thead>
+                    <tbody id="admin-emp-tbody">
+                        <tr><td colspan="5" style="text-align:center;padding:30px;color:#94a3b8;">Loading employee data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="page-calendar" class="page">
+            <div class="cal-header">
+                <h3>July 2026</h3>
+                <span>Attendance Calendar</span>
+            </div>
+            <div class="cal-grid">
+                <div style="font-size:0.7rem;color:#64748b;text-align:center;padding:4px;font-weight:600;">Sun</div>
+                <div style="font-size:0.7rem;color:#64748b;text-align:center;padding:4px;font-weight:600;">Mon</div>
+                <div style="font-size:0.7rem;color:#64748b;text-align:center;padding:4px;font-weight:600;">Tue</div>
+                <div style="font-size:0.7rem;color:#64748b;text-align:center;padding:4px;font-weight:600;">Wed</div>
+                <div style="font-size:0.7rem;color:#64748b;text-align:center;padding:4px;font-weight:600;">Thu</div>
+                <div style="font-size:0.7rem;color:#64748b;text-align:center;padding:4px;font-weight:600;">Fri</div>
+                <div style="font-size:0.7rem;color:#64748b;text-align:center;padding:4px;font-weight:600;">Sat</div>
+                {% for i in range(31) %}
+                <div class="day {% if i+1 == 27 %}today{% endif %}">
+                    <div class="num">{{ i+1 }}</div>
+                    {% if i+1 in [1,6,13,20,27] %}
+                    <div class="event">&#9679;</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            <div style="margin-top:12px;background:white;border-radius:8px;padding:12px 16px;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+                <div style="font-size:0.8rem;font-weight:600;color:#0f172a;margin-bottom:6px;">Today's Events</div>
+                <div style="font-size:0.8rem;color:#64748b;">&#9679; Attendance tracking active &mdash; {{ device.DeviceFName }}</div>
+                <div style="font-size:0.8rem;color:#64748b;margin-top:4px;">&#9679; No pending tasks</div>
+            </div>
+        </div>
+
+        <div id="page-admin" class="page">
+            <div class="hr-card">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                    <h4 style="margin:0;">Manager Allocation</h4>
+                    <button onclick="showAddManager()" style="padding:6px 14px;background:#1e293b;color:white;border:none;border-radius:6px;font-size:0.8rem;font-weight:600;cursor:pointer;">+ Add Manager</button>
+                </div>
+                <div id="mgr-table-wrapper" class="emp-grid">
+                    <table class="emp-table">
+                        <thead><tr><th>Manager</th><th>Device</th><th>Location</th><th>Action</th></tr></thead>
+                        <tbody id="mgr-tbody">
+                            <tr><td colspan="4" style="text-align:center;padding:30px;color:#94a3b8;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="add-mgr-form" style="display:none;" class="hr-card">
+                <h4 style="margin-bottom:10px;">Add New Manager</h4>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                    <div><label style="font-size:0.75rem;font-weight:600;color:#475569;">Username</label><input id="mgr-user" placeholder="username" style="width:100%;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:0.85rem;"></div>
+                    <div><label style="font-size:0.75rem;font-weight:600;color:#475569;">Password</label><input id="mgr-pass" type="password" placeholder="password" style="width:100%;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:0.85rem;"></div>
+                    <div><label style="font-size:0.75rem;font-weight:600;color:#475569;">Label</label><input id="mgr-label" placeholder="e.g. Manager - Location" style="width:100%;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:0.85rem;"></div>
+                    <div><label style="font-size:0.75rem;font-weight:600;color:#475569;">Location</label><input id="mgr-location" placeholder="e.g. Chennai" style="width:100%;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:0.85rem;"></div>
+                    <div><label style="font-size:0.75rem;font-weight:600;color:#475569;">Assign Device</label>
+                        <select id="mgr-device" style="width:100%;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:0.85rem;">
+                            <option value="">-- None --</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="margin-top:10px;display:flex;gap:8px;">
+                    <button onclick="saveManager()" style="padding:7px 18px;background:#2563eb;color:white;border:none;border-radius:6px;font-size:0.85rem;font-weight:600;cursor:pointer;">Save</button>
+                    <button onclick="hideAddManager()" style="padding:7px 18px;background:#e2e8f0;color:#475569;border:none;border-radius:6px;font-size:0.85rem;font-weight:600;cursor:pointer;">Cancel</button>
+                </div>
+                <div id="add-mgr-msg" style="margin-top:8px;font-size:0.8rem;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="main" style="padding:10px 20px 20px;flex:1;display:flex;flex-direction:column;gap:10px;">
+    <div class="stats-row" style="display:flex;gap:10px;">
+        <div style="flex:1;background:#ffffff;border-radius:8px;padding:12px 16px;box-shadow:0 1px 3px rgba(0,0,0,0.06);border-left:4px solid #10b981;">
+            <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:#059669;">Present</div>
+            <div style="font-size:1.8rem;font-weight:700;color:#10b981;margin-top:2px;" id="present-count">0</div>
+        </div>
+        <div style="flex:1;background:#ffffff;border-radius:8px;padding:12px 16px;box-shadow:0 1px 3px rgba(0,0,0,0.06);border-left:4px solid #ef4444;">
+            <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:#dc2626;">Absent</div>
+            <div style="font-size:1.8rem;font-weight:700;color:#ef4444;margin-top:2px;" id="absent-count">0</div>
+        </div>
+    </div>
+    <div style="background:#ffffff;border-radius:8px;padding:12px 16px;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;">
+            <div><div style="font-size:0.65rem;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Device</div><div style="font-size:0.85rem;font-weight:600;color:#0f172a;margin-top:1px;">{{ device.DeviceFName }}</div></div>
+            <div><div style="font-size:0.65rem;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Serial</div><div style="font-size:0.85rem;font-weight:600;color:#0f172a;margin-top:1px;font-family:monospace;letter-spacing:1px;">{{ device.SerialNumber }}</div></div>
+            <div><div style="font-size:0.65rem;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">IP</div><div style="font-size:0.85rem;font-weight:600;color:#0f172a;margin-top:1px;font-family:monospace;">{{ device.IpAddress }}</div></div>
+            <div><div style="font-size:0.65rem;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Status</div><div style="font-size:0.85rem;font-weight:600;color:#0f172a;margin-top:1px;"><span class="badge {% if device.is_online %}badge-green{% else %}badge-red{% endif %}" id="mgr-device-status">{% if device.is_online %}Online{% else %}Offline{% endif %}</span></div></div>
+            <div><div style="font-size:0.65rem;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Last Ping</div><div style="font-size:0.85rem;font-weight:600;color:#0f172a;margin-top:1px;" id="mgr-last-ping">{{ device.last_ping_ago or 'Never' }}</div></div>
+            <div><div style="font-size:0.65rem;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Location</div><div style="font-size:0.85rem;font-weight:600;color:#0f172a;margin-top:1px;">Client Place</div></div>
+        </div>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;">
+        <div style="margin-bottom:8px;"><input type="text" id="search-input" placeholder="Search by name or ID..." oninput="filterEmployees()" style="width:100%;padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:0.85rem;outline:none;"></div>
+        <div style="background:#ffffff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.06);overflow:auto;flex:1;">
+            <table style="width:100%;border-collapse:collapse;">
+                <thead><tr><th style="background:#f8fafc;color:#64748b;font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;padding:8px 12px;text-align:left;border-bottom:1px solid #e2e8f0;position:sticky;top:0;">ID</th><th style="background:#f8fafc;color:#64748b;font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;padding:8px 12px;text-align:left;border-bottom:1px solid #e2e8f0;position:sticky;top:0;">Name</th><th style="background:#f8fafc;color:#64748b;font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;padding:8px 12px;text-align:left;border-bottom:1px solid #e2e8f0;position:sticky;top:0;">Status</th><th style="background:#f8fafc;color:#64748b;font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;padding:8px 12px;text-align:left;border-bottom:1px solid #e2e8f0;position:sticky;top:0;">Punches</th><th style="background:#f8fafc;color:#64748b;font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;padding:8px 12px;text-align:left;border-bottom:1px solid #e2e8f0;position:sticky;top:0;">Last Punch</th></tr></thead>
+                <tbody id="emp-tbody"><tr><td colspan="5" style="text-align:center;padding:30px;color:#94a3b8;">Loading attendance data...</td></tr></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<script>
+{% if logged_in and is_admin %}
+let adminApiUrl = '/attendance/api/live/48';
+let deviceStatusUrl = '/api/device/48/status';
+
+function showPage(page, el) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('page-' + page).classList.add('active');
+    if (el) el.classList.add('active');
+}
+
+function filterAdminEmployees() {
+    let q = document.getElementById('admin-search').value.toLowerCase();
+    let rows = document.querySelectorAll('#admin-emp-tbody .emp-row');
+    rows.forEach(row => {
+        let name = row.getAttribute('data-name') || '';
+        let id = row.getAttribute('data-id') || '';
+        row.style.display = (name.includes(q) || id.includes(q)) ? '' : 'none';
+    });
+}
+
+function escapeHtml(t) { if (!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+
+async function refreshDeviceStatus() {
+    try {
+        let r = await fetch(deviceStatusUrl);
+        let d = await r.json();
+        if (!d) return;
+        let badge = document.querySelector('#admin-dev-status .device-badge');
+        if (badge) {
+            badge.innerHTML = '<span class="dot ' + (d.is_online ? 'dot-green' : 'dot-red') + '"></span>' + (d.is_online ? 'Online' : 'Offline');
+        }
+        let pingEl = document.getElementById('admin-last-ping');
+        if (pingEl) pingEl.innerText = d.last_ping_ago || 'No connection yet';
+    } catch(e) { console.log('Device status refresh error', e); }
+}
+
+async function refreshAdmin() {
+    try {
+        let r = await fetch(adminApiUrl);
+        let d = await r.json();
+        if (!d || !d.employees) return;
+        let total = d.employees.length;
+        document.getElementById('admin-total-emp').innerText = total;
+        document.getElementById('update-time').innerText = d.lastUpdated || '--';
+        let tbody = document.getElementById('admin-emp-tbody');
+        let html = '';
+        if (d.employees.length === 0) {
+            html = '<tr><td colspan="5" style="text-align:center;padding:30px;color:#94a3b8;">No employees found</td></tr>';
+        } else {
+            d.employees.forEach(emp => {
+                let sc = emp.status === 'IN' ? 'badge-green' : 'badge-red';
+                let st = emp.status === 'IN' ? 'Present' : 'Absent';
+                let pc = (emp.punchTimes && emp.punchTimes.length) || 0;
+                html += '<tr class="emp-row" data-name="' + escapeHtml(emp.name.toLowerCase()) + '" data-id="' + (emp.id || '').padStart(4,'0') + '">';
+                html += '<td>' + (emp.id || '').padStart(4,'0') + '</td>';
+                html += '<td>' + escapeHtml(emp.name) + '</td>';
+                html += '<td><span class="badge ' + sc + '">' + st + '</span></td>';
+                html += '<td>' + pc + ' punches</td>';
+                html += '<td>' + escapeHtml(emp.lastPunch) + '</td></tr>';
+            });
+        }
+        tbody.innerHTML = html;
+        filterAdminEmployees();
+    } catch(e) { console.log('Admin refresh error', e); }
+}
+
+refreshDeviceStatus();
+refreshAdmin();
+setInterval(refreshAdmin, 10000);
+setInterval(refreshDeviceStatus, 15000);
+
+loadManagers();
+function showAddManager() {
+    document.getElementById('add-mgr-form').style.display = 'block';
+    document.getElementById('add-mgr-msg').innerText = '';
+    let sel = document.getElementById('mgr-device');
+    sel.innerHTML = '<option value="">-- None --</option>';
+    if (window.mgrData) {
+        window.mgrData.devices.forEach(dev => {
+            sel.innerHTML += '<option value="' + dev.DeviceId + '">' + escapeHtml(dev.DeviceFName) + '</option>';
+        });
+    }
+}
+function hideAddManager() {
+    document.getElementById('add-mgr-form').style.display = 'none';
+    document.getElementById('mgr-user').value = '';
+    document.getElementById('mgr-pass').value = '';
+    document.getElementById('mgr-label').value = '';
+    document.getElementById('mgr-location').value = '';
+    document.getElementById('mgr-device').value = '';
+    document.getElementById('add-mgr-msg').innerText = '';
+}
+async function saveManager() {
+    let username = document.getElementById('mgr-user').value.trim();
+    let password = document.getElementById('mgr-pass').value.trim();
+    let label = document.getElementById('mgr-label').value.trim();
+    let location = document.getElementById('mgr-location').value.trim();
+    let deviceId = document.getElementById('mgr-device').value || null;
+    let msg = document.getElementById('add-mgr-msg');
+    if (!username || !password) { msg.innerText = 'Username and password required'; msg.style.color = '#ef4444'; return; }
+    msg.innerText = 'Saving...'; msg.style.color = '#3b82f6';
+    try {
+        let r = await fetch('/api/managers/add', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({username, password, label, location, device_id: deviceId})
+        });
+        let d = await r.json();
+        if (d.success) {
+            msg.innerText = 'Manager added!'; msg.style.color = '#10b981';
+            hideAddManager();
+            loadManagers();
+        } else {
+            msg.innerText = d.error || 'Error'; msg.style.color = '#ef4444';
+        }
+    } catch(e) { msg.innerText = 'Error saving'; msg.style.color = '#ef4444'; }
+}
+let assignTimers = {};
+function assignManager(sel) {
+    let username = sel.getAttribute('data-username');
+    let deviceId = sel.value || null;
+    let statusEl = document.getElementById('saved-' + username);
+    statusEl.innerText = 'Saving...';
+    statusEl.style.color = '#3b82f6';
+    if (assignTimers[username]) clearTimeout(assignTimers[username]);
+    assignTimers[username] = setTimeout(async function() {
+        try {
+            let r = await fetch('/api/managers/assign', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({username, device_id: deviceId})
+            });
+            let d = await r.json();
+            if (d.success) { statusEl.innerText = 'Saved'; statusEl.style.color = '#10b981'; }
+            else { statusEl.innerText = 'Error'; statusEl.style.color = '#ef4444'; }
+        } catch(e) { statusEl.innerText = 'Error'; statusEl.style.color = '#ef4444'; }
+    }, 500);
+}
+async function loadManagers() {
+    try {
+        let r = await fetch('/api/managers');
+        let d = await r.json();
+        if (!d || !d.managers) return;
+        window.mgrData = d;
+        let tbody = document.getElementById('mgr-tbody');
+        let html = '';
+        if (d.managers.length === 0) {
+            html = '<tr><td colspan="4" style="text-align:center;padding:30px;color:#94a3b8;">No managers found</td></tr>';
+        } else {
+            d.managers.forEach(mgr => {
+                let devOpts = '<option value="">-- None --</option>';
+                d.devices.forEach(dev => {
+                    let sel = dev.DeviceId === mgr.device_id ? 'selected' : '';
+                    devOpts += '<option value="' + dev.DeviceId + '" ' + sel + '>' + escapeHtml(dev.DeviceFName) + '</option>';
+                });
+                let curDev = d.devices.find(dev => dev.DeviceId === mgr.device_id);
+                let curName = curDev ? escapeHtml(curDev.DeviceFName) : '<span style="color:#94a3b8;">Not assigned</span>';
+                html += '<tr>';
+                html += '<td><strong>' + escapeHtml(mgr.label) + '</strong><br><span style="font-size:0.7rem;color:#64748b;">@' + escapeHtml(mgr.username) + '</span></td>';
+                html += '<td>' + curName + '</td>';
+                html += '<td><select data-username="' + escapeHtml(mgr.username) + '" onchange="assignManager(this)" style="padding:4px 8px;border:1.5px solid #e2e8f0;border-radius:5px;font-size:0.8rem;width:100%;max-width:200px;">' + devOpts + '</select></td>';
+                html += '<td><span id="saved-' + escapeHtml(mgr.username) + '" style="font-size:0.75rem;color:#10b981;"></span></td>';
+                html += '</tr>';
+            });
+        }
+        tbody.innerHTML = html;
+    } catch(e) { console.log('Load managers error', e); }
+}
+loadManagers();
+
+{% elif logged_in and not is_admin %}
+let attendanceApiUrl = '/attendance/api/live/48';
+
+function filterEmployees() {
+    let q = document.getElementById('search-input').value.toLowerCase();
+    let rows = document.querySelectorAll('#emp-tbody .emp-row');
+    rows.forEach(row => {
+        let name = row.getAttribute('data-name') || '';
+        let id = row.getAttribute('data-id') || '';
+        row.style.display = (name.includes(q) || id.includes(q)) ? '' : 'none';
+    });
+}
+
+function escapeHtml(t) { if (!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+
+async function refresh() {
+    try {
+        let r = await fetch(attendanceApiUrl);
+        let d = await r.json();
+        if (!d || !d.employees) return;
+
+        document.getElementById('present-count').innerText = d.present || 0;
+        document.getElementById('absent-count').innerText = d.absent || 0;
+        document.getElementById('update-time').innerText = d.lastUpdated || '--';
+
+        let tbody = document.getElementById('emp-tbody');
+        let html = '';
+        if (d.employees.length === 0) {
+            html = '<tr><td colspan="5" style="text-align:center;padding:30px;color:#94a3b8;">No employees found</td></tr>';
+        } else {
+            d.employees.forEach(emp => {
+                let sc = emp.status === 'IN' ? 'badge-green' : 'badge-red';
+                let st = emp.status === 'IN' ? 'Present' : 'Absent';
+                let pc = (emp.punchTimes && emp.punchTimes.length) || 0;
+                html += '<tr class="emp-row" data-name="' + escapeHtml(emp.name.toLowerCase()) + '" data-id="' + (emp.id || '').padStart(4,'0') + '">';
+                html += '<td>' + (emp.id || '').padStart(4,'0') + '</td>';
+                html += '<td>' + escapeHtml(emp.name) + '</td>';
+                html += '<td><span class="badge ' + sc + '">' + st + '</span></td>';
+                html += '<td>' + pc + ' punches</td>';
+                html += '<td>' + escapeHtml(emp.lastPunch) + '</td></tr>';
+            });
+        }
+        tbody.innerHTML = html;
+        filterEmployees();
+    } catch(e) { console.log('Refresh error', e); }
+}
+refresh();
+setInterval(refresh, 10000);
+{% endif %}
+</script>
+</body>
+</html>
