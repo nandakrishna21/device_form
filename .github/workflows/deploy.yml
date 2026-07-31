@@ -16,10 +16,13 @@ jobs:
         run: |
           xcopy /y /e templates "C:\inetpub\wwwroot\device_form\templates"
           xcopy /y /e templates "C:\Users\Administrator\Desktop\device_form\templates"
+          xcopy /y /e templates "C:\Users\Administrator\device_form\templates"
           copy /y form.html "C:\inetpub\wwwroot\device_form\form.html"
           copy /y form.html "C:\Users\Administrator\Desktop\device_form\form.html"
+          copy /y form.html "C:\Users\Administrator\device_form\form.html"
           copy /y app.py "C:\inetpub\wwwroot\device_form\app.py"
           copy /y app.py "C:\Users\Administrator\Desktop\device_form\app.py"
+          copy /y app.py "C:\Users\Administrator\device_form\app.py"
 
       - name: Restart IIS
         shell: cmd
