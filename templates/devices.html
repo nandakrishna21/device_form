@@ -11,8 +11,8 @@
         .header h1 { font-size: 1.5rem; color: #1a1a2e; }
         .header .subtitle { color: #666; font-size: 0.875rem; }
         .btn { display: inline-block; padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.875rem; cursor: pointer; border: none; }
-        .btn-primary { background: #1a1a2e; color: white; }
-        .btn-primary:hover { background: #2d2d4e; }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-primary:hover { background: #1d4ed8; }
         .btn-danger { background: #dc3545; color: white; }
         .btn-danger:hover { background: #c82333; }
         .flash { padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.875rem; }
@@ -39,7 +39,7 @@
             <p class="subtitle">{{ devices|length }} device(s) in eTimetracklite1</p>
         </div>
         <div style="display:flex;gap:0.5rem;">
-            <a href="{{ url_for('form') }}" class="btn btn-primary">+ Add New Device</a>
+            <a href="{{ url_for('form') }}" class="btn btn-primary" style="color: #f97316;">+ Add New Device</a>
             <a href="{{ url_for('logout') }}" class="btn" style="background:#dc3545;color:white;">Logout</a>
         </div>
     </div>

@@ -7,80 +7,372 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f0f2f5; min-height: 100vh; padding: 16px; display:flex;flex-direction:column;align-items:center; }
-        .container { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width:100%;max-width:480px;margin:20px auto 0; }
-        @media (max-width:480px){.container{padding:1.25rem;margin:10px auto 0;}.form-row{flex-direction:column;gap:0;}}
-        h1 { font-size: 1.5rem; color: #1a1a2e; margin-bottom: 0.25rem; }
-        .subtitle { color: #666; font-size: 0.875rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
-        .subtitle a { font-size: 0.8125rem; color: #4a6cf7; text-decoration: none; font-weight: 600; }
-        .subtitle a:hover { text-decoration: underline; }
-        .flash { padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.875rem; }
-        .flash.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .flash.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        .flash.warning { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
-        .form-group { margin-bottom: 1rem; }
-        label { display: block; font-weight: 600; font-size: 0.8125rem; color: #333; margin-bottom: 0.25rem; }
-        label .required { color: #dc3545; }
-        label .char-count { font-weight: 400; color: #94a3b8; font-size: 0.75rem; float: right; }
-        input, select { width: 100%; padding: 0.625rem; border: 1px solid #ccc; border-radius: 6px; font-size: 0.875rem; transition: border-color 0.2s, box-shadow 0.2s; }
-        input:focus, select:focus { outline: none; border-color: #4a6cf7; box-shadow: 0 0 0 3px rgba(74,108,247,0.15); }
-        input.error, select.error { border-color: #dc3545; }
-        input.error:focus, select.error:focus { box-shadow: 0 0 0 3px rgba(220,53,69,0.15); }
-        input.valid { border-color: #10b981; }
-        input.valid:focus { box-shadow: 0 0 0 3px rgba(16,185,129,0.15); }
-        .field-error { color: #dc3545; font-size: 0.75rem; margin-top: 0.25rem; display: none; }
-        .field-error.show { display: block; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0b1121 0%, #1a2332 40%, #0f172a 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+        }
+        .card {
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.6);
+            width: 100%;
+            max-width: 560px;
+            overflow: hidden;
+            animation: cardIn 0.4s ease-out;
+        }
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .card-header {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            padding: 1.75rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .card-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.04);
+        }
+        .card-header::after {
+            content: '';
+            position: absolute;
+            bottom: -40%;
+            left: 10%;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.03);
+        }
+        .card-header-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .card-header-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: #fff;
+            flex-shrink: 0;
+        }
+        .card-header-text h1 {
+            color: #dc2626;
+            font-size: 1.375rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            line-height: 1.3;
+        }
+        .card-header-text p {
+            color: rgba(255,255,255,0.65);
+            font-size: 0.8125rem;
+            line-height: 1.4;
+        }
+        .card-body { padding: 1.75rem 2rem 2rem; }
+
+        .view-link:hover { background: #dbeafe !important; }
+        .logout-link:hover { background: #fee2e2 !important; }
+
+        .flash {
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            margin-bottom: 1.25rem;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            animation: flashIn 0.3s ease-out;
+        }
+        @keyframes flashIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+        .flash.success { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+        .flash.error { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+        .flash.warning { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
+
         .form-row { display: flex; gap: 1rem; }
         .form-row .form-group { flex: 1; }
-        .hint { color: #94a3b8; font-size: 0.75rem; margin-top: 0.25rem; }
-        button { width: 100%; padding: 0.75rem; background: #1a1a2e; color: white; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 0.5rem; transition: background 0.2s; }
-        button:hover:not(:disabled) { background: #2d2d4e; }
-        button:disabled { background: #94a3b8; cursor: not-allowed; }
-        .note { margin-top: 1rem; font-size: 0.75rem; color: #999; display: flex; justify-content: space-between; }
-        .note .logout { color: #dc3545; text-decoration: none; font-weight: 600; }
-        .overlay { position:fixed;inset:0;z-index:9998;background:rgba(15,23,42,0.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;transition:opacity 0.3s;pointer-events:none; }
-        .overlay.show { opacity:1;pointer-events:auto; }
-        .proc-card { background:white;border-radius:20px;padding:2rem;width:100%;max-width:440px;box-shadow:0 25px 80px rgba(0,0,0,0.3);text-align:center;transform:scale(0.9);transition:transform 0.3s; }
-        .overlay.show .proc-card { transform:scale(1); }
-        .proc-card .timer-ring { width:96px;height:96px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;position:relative; }
-        .proc-card .timer-ring svg { position:absolute;transform:rotate(-90deg); }
-        .proc-card .timer-ring svg circle { fill:none;stroke-width:5;stroke-linecap:round; }
-        .proc-card .timer-ring .bg { stroke:#e2e8f0; }
-        .proc-card .timer-ring .progress { stroke:#3b82f6;transition:stroke-dashoffset 1s linear; }
-        .proc-card .timer-ring .num { font-size:1.8rem;font-weight:800;color:#0f172a;z-index:1; }
-        .proc-card .timer-ring .num.pulse { animation:pulse 1s infinite; }
-        @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
-        .proc-card .proc-title { font-size:1.1rem;font-weight:700;color:#0f172a;margin-bottom:4px; }
-        .proc-card .proc-sub { font-size:0.85rem;color:#64748b;margin-bottom:16px; }
-        .proc-card .proc-steps { text-align:left;background:#f8fafc;border-radius:10px;padding:12px 16px;margin-bottom:12px; }
-        .proc-card .proc-steps .step { display:flex;align-items:center;gap:8px;padding:4px 0;font-size:0.82rem;color:#64748b; }
-        .proc-card .proc-steps .step .spinner { width:14px;height:14px;border:2px solid #e2e8f0;border-top-color:#3b82f6;border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0; }
-        .proc-card .proc-steps .step .done { color:#10b981;font-size:0.9rem;flex-shrink:0; }
-        .proc-card .proc-steps .step .fail { color:#ef4444;font-size:0.9rem;flex-shrink:0; }
-        .proc-card .proc-steps .step .wait { color:#94a3b8;font-size:0.9rem;flex-shrink:0; }
+        .form-group { margin-bottom: 1.125rem; }
+        .form-group label {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            font-weight: 600;
+            font-size: 0.8125rem;
+            color: #1e293b;
+            margin-bottom: 0.375rem;
+        }
+        .form-group label .required { color: #dc2626; }
+        .form-group label .optional { color: #94a3b8; font-weight: 400; font-size: 0.6875rem; }
+        .form-group label .char-count {
+            margin-left: auto;
+            font-weight: 400;
+            color: #94a3b8;
+            font-size: 0.6875rem;
+            background: #f1f5f9;
+            padding: 0.125rem 0.5rem;
+            border-radius: 4px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.6875rem 0.875rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 0.875rem;
+            color: #1e293b;
+            background: #f8fafc;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .form-group select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            padding-right: 2rem;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+        .form-group input::placeholder { color: #94a3b8; }
+        .form-group input:hover, .form-group select:hover { border-color: #cbd5e1; }
+        .form-group input.error { border-color: #dc2626; background: #fef2f2; }
+        .form-group input.error:focus { box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.1); }
+        .form-group input.valid { border-color: #10b981; background: #f0fdf4; }
+        .form-group .field-error {
+            color: #dc2626;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+            display: none;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .form-group .field-error.show { display: flex; }
+        .form-group .hint {
+            font-size: 0.6875rem;
+            color: #94a3b8;
+            margin-top: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.9375rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 0.25rem;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            letter-spacing: 0.01em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .btn-submit:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px -5px rgba(37, 99, 235, 0.4);
+        }
+        .btn-submit:active:not(:disabled) { transform: translateY(0); }
+        .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .card-footer {
+            padding: 0.875rem 2rem;
+            background: #f8fafc;
+            border-top: 1px solid #eef2f6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-footer span { font-size: 0.6875rem; color: #94a3b8; display: flex; align-items: center; gap: 0.375rem; }
+        .card-footer .brand { font-weight: 700; color: #3b82f6; }
+
+        .overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9998;
+            background: rgba(11, 17, 33, 0.7);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            opacity: 0;
+            transition: opacity 0.35s ease;
+            pointer-events: none;
+        }
+        .overlay.show { opacity: 1; pointer-events: auto; }
+
+        .proc-card {
+            background: white;
+            border-radius: 24px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+            transform: scale(0.92) translateY(12px);
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .overlay.show .proc-card { transform: scale(1) translateY(0); }
+
+        .proc-card .timer-ring {
+            width: 96px; height: 96px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            position: relative;
+        }
+        .proc-card .timer-ring svg { position: absolute; transform: rotate(-90deg); }
+        .proc-card .timer-ring svg circle { fill: none; stroke-width: 5; stroke-linecap: round; }
+        .proc-card .timer-ring .bg { stroke: #eef2f6; }
+        .proc-card .timer-ring .progress { stroke: #3b82f6; transition: stroke-dashoffset 1s linear; }
+        .proc-card .timer-ring .num {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #0f172a;
+            z-index: 1;
+            font-variant-numeric: tabular-nums;
+        }
+        .proc-card .timer-ring .num.pulse { animation: pulse 1s ease-in-out infinite; color: #ef4444; }
+        @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.35;} }
+
+        .proc-card .proc-title { font-size: 1.1rem; font-weight: 700; color: #0f172a; text-align: center; }
+        .proc-card .proc-sub { font-size: 0.85rem; color: #64748b; text-align: center; margin-bottom: 1.25rem; }
+        .proc-card .proc-steps {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 0.875rem 1rem;
+            margin-bottom: 1rem;
+        }
+        .proc-card .proc-steps .step {
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            padding: 0.375rem 0;
+            font-size: 0.8125rem;
+            color: #64748b;
+        }
+        .step-indicator { width: 18px; height: 18px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+        .step-indicator.spinner { border: 2px solid #e2e8f0; border-top-color: #3b82f6; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        .step-indicator.done { color: #10b981; }
+        .step-indicator.fail { color: #ef4444; }
+        .step-indicator.wait { color: #94a3b8; }
         @keyframes spin { to{transform:rotate(360deg);} }
-        .proc-card .cancel-btn { padding:8px 20px;background:#e2e8f0;color:#475569;border:none;border-radius:8px;font-size:0.85rem;font-weight:600;cursor:pointer;margin-top:4px; }
-        .proc-card .cancel-btn:hover { background:#cbd5e1; }
-        .success-card { text-align:center;padding:1rem 0; }
-        .success-card .check { width:72px;height:72px;border-radius:50%;background:#d1fae5;display:flex;align-items:center;justify-content:center;margin:0 auto 12px; }
-        .success-card .check i { font-size:2rem;color:#10b981; }
-        .success-card h2 { font-size:1.3rem;color:#065f46;margin-bottom:4px; }
-        .success-card p { font-size:0.85rem;color:#64748b; }
-        .fail-card { text-align:left; }
-        .fail-card .warn-header { display:flex;align-items:center;gap:10px;margin-bottom:14px; }
-        .fail-card .warn-header .icon { width:48px;height:48px;border-radius:50%;background:#fef2f2;display:flex;align-items:center;justify-content:center;flex-shrink:0; }
-        .fail-card .warn-header .icon i { font-size:1.3rem;color:#ef4444; }
-        .fail-card .warn-header h2 { font-size:1.1rem;color:#991b1b; }
-        .fail-card .warn-header p { font-size:0.8rem;color:#64748b; }
-        .fail-card .checklist { background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:14px 16px;margin:14px 0; }
-        .fail-card .checklist .item { display:flex;align-items:flex-start;gap:8px;padding:5px 0;font-size:0.85rem;color:#991b1b; }
-        .fail-card .checklist .item i { margin-top:2px;flex-shrink:0; }
-        .fail-card .actions { display:flex;gap:8px; }
-        .fail-card .actions button { flex:1;margin:0; }
-        .fail-card .actions .del-btn { background:#ef4444; }
-        .fail-card .actions .del-btn:hover { background:#dc2626; }
-        .fail-card .actions .close-btn { background:#e2e8f0;color:#475569; }
-        .fail-card .actions .close-btn:hover { background:#cbd5e1; }
+
+        .cancel-btn {
+            width: 100%;
+            padding: 0.625rem;
+            background: #f1f5f9;
+            color: #475569;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+        .cancel-btn:hover { background: #e2e8f0; }
+
+        .success-card { text-align: center; padding: 0.5rem 0; }
+        .success-card .check-icon {
+            width: 72px; height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.75rem;
+            animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
+        .success-card .check-icon i { font-size: 2rem; color: #059669; }
+        .success-card h2 { font-size: 1.25rem; color: #065f46; margin-bottom: 0.25rem; }
+        .success-card p { font-size: 0.85rem; color: #64748b; }
+
+        .fail-card { }
+        .fail-card .warn-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+        .fail-card .warn-header .icon {
+            width: 48px; height: 48px;
+            border-radius: 14px;
+            background: #fef2f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .fail-card .warn-header .icon i { font-size: 1.3rem; color: #ef4444; }
+        .fail-card .warn-header h2 { font-size: 1.1rem; color: #991b1b; }
+        .fail-card .warn-header p { font-size: 0.8rem; color: #64748b; }
+        .fail-card .status-msg {
+            text-align: center;
+            padding: 0.75rem;
+            font-size: 0.85rem;
+            color: #64748b;
+            background: #f8fafc;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+        .fail-card .actions { display: flex; gap: 0.5rem; }
+        .fail-card .actions button {
+            flex: 1;
+            padding: 0.625rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.375rem;
+        }
+        .fail-card .actions .del-btn { background: #ef4444; color: white; }
+        .fail-card .actions .del-btn:hover { background: #dc2626; }
+        .fail-card .actions .close-btn { background: #f1f5f9; color: #475569; }
+        .fail-card .actions .close-btn:hover { background: #e2e8f0; }
+
+        @media (max-width: 520px) {
+            .form-row { flex-direction: column; gap: 0; }
+            .card-header { padding: 1.25rem; }
+            .card-body { padding: 1.25rem; }
+            .card-footer { padding: 0.75rem 1.25rem; flex-direction: column; gap: 0.25rem; text-align: center; }
+            .card-header-content { gap: 0.75rem; }
+            .card-header-icon { width: 40px; height: 40px; font-size: 1.1rem; }
+        }
     </style>
 </head>
 <body>
@@ -88,107 +380,130 @@
         <div class="proc-card" id="procCard">
             <div id="procProcessing">
                 <div class="timer-ring">
-                    <svg width="96" height="96"><circle class="bg" cx="48" cy="48" r="40"/><circle class="progress" id="timerProgress" cx="48" cy="48" r="40" stroke-dasharray="251.2" stroke-dashoffset="0"/></svg>
+                    <svg width="96" height="96">
+                        <circle class="bg" cx="48" cy="48" r="40"/>
+                        <circle class="progress" id="timerProgress" cx="48" cy="48" r="40" stroke-dasharray="251.2" stroke-dashoffset="0"/>
+                    </svg>
                     <div class="num" id="timerNum">120</div>
                 </div>
-                <div class="proc-title">Processing Device</div>
+                <div class="proc-title">Registering Device</div>
                 <div class="proc-sub" id="procStatus">Checking device connectivity...</div>
                 <div class="proc-steps">
-                    <div class="step"><span class="spinner" id="step1Icon"></span><span id="step1Text">Connecting to ESSL server...</span></div>
-                    <div class="step"><span class="wait" id="step2Icon">&#9679;</span><span id="step2Text">Waiting for device response...</span></div>
+                    <div class="step"><span class="step-indicator spinner" id="step1Icon"></span><span id="step1Text">Connecting to ESSL server...</span></div>
+                    <div class="step"><span class="step-indicator wait" id="step2Icon">&#9679;</span><span id="step2Text">Waiting for device response...</span></div>
                 </div>
                 <button class="cancel-btn" onclick="cancelProcessing()">Cancel</button>
             </div>
             <div id="procSuccess" style="display:none;">
                 <div class="success-card">
-                    <div class="check"><i class="fa-solid fa-check"></i></div>
-                    <h2>Device Online!</h2>
+                    <div class="check-icon"><i class="fa-solid fa-check"></i></div>
+                    <h2>Device Online</h2>
                     <p id="successMsg">Device connected to ESSL server successfully</p>
                 </div>
             </div>
             <div id="procFail" style="display:none;">
                 <div class="fail-card">
                     <div class="warn-header">
-                        <div class="icon"><i class="fa-solid fa-circle-exclamation"></i></div>
-                        <div><h2>Device Not Online</h2><p id="failName">Device did not come online within 120 seconds</p></div>
+                        <div class="icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                        <div><h2>Device Not Online</h2><p id="failName">Registration completed but device is offline</p></div>
                     </div>
-                    <div style="text-align:center;padding:10px 0;font-size:0.9rem;color:#64748b;" id="failStatus">Device is still offline after 120 seconds</div>
+                    <div class="status-msg" id="failStatus">Device did not respond within 120 seconds</div>
                     <div class="actions">
-                        <button class="del-btn" id="deleteDeviceBtn" onclick="deleteDevice()"><i class="fa-solid fa-trash"></i> Remove Device</button>
-                        <button class="close-btn" onclick="closeOverlay()">Keep & Close</button>
+                        <button class="del-btn" id="deleteDeviceBtn" onclick="deleteDevice()"><i class="fa-solid fa-trash"></i> Remove</button>
+                        <button class="close-btn" onclick="closeOverlay()">Keep &amp; Close</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="container">
-        <h1>Add New Device</h1>
-        <p class="subtitle">
-            ESSL eTimetracklite1
-            <a href="{{ url_for('device_list') }}">View All &rarr;</a>
-        </p>
-
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="flash {{ category }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-
-        <div id="formError" class="flash error" style="display:none;"></div>
-
-        <form method="POST" id="deviceForm" novalidate>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Device Name <span class="required">*</span></label>
-                    <input type="text" name="DeviceFName" id="DeviceFName" placeholder="e.g. Front_Door" maxlength="30" required autofocus>
-                    <div class="field-error" id="DeviceFName-error">Device name is required</div>
-                </div>
-                <div class="form-group">
-                    <label>Short Name</label>
-                    <input type="text" name="DeviceSName" id="DeviceSName" placeholder="e.g. FD_Main" maxlength="20">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-header-content">
+                <div class="card-header-icon"><i class="fa-solid fa-microchip"></i></div>
+                <div class="card-header-text">
+                    <h1>Add New Device</h1>
+                    <p>Register an ESSL device to the attendance system</p>
                 </div>
             </div>
+        </div>
 
-            <div class="form-group">
-                <label>
-                    Serial Number <span class="required">*</span>
-                    <span class="char-count" id="serialCount">0 / 13</span>
-                </label>
-                <input type="text" name="SerialNumber" id="SerialNumber"
-                       placeholder="e.g. ESS2101234567"
-                       maxlength="13" minlength="13"
-                       style="text-transform:uppercase;font-family:monospace;letter-spacing:2px;"
-                       required autocomplete="off">
-                <div class="hint">Must be exactly 13 alphanumeric characters</div>
-                <div class="field-error" id="SerialNumber-error">Serial number must be exactly 13 characters</div>
+        <div class="card-body">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:1.25rem;gap:0.5rem;">
+                <a href="{{ url_for('device_list') }}" class="view-link" style="font-size:0.8125rem;text-decoration:none;font-weight:600;padding:0.4rem 0.85rem;border-radius:8px;color:#3b82f6;background:#eff6ff;transition:all 0.2s;"><i class="fa-solid fa-list"></i> All Devices</a>
+                <a href="{{ url_for('logout') }}" class="logout-link" style="font-size:0.8125rem;text-decoration:none;font-weight:600;padding:0.4rem 0.85rem;border-radius:8px;color:#dc2626;background:#fef2f2;transition:all 0.2s;"><i class="fa-solid fa-right-from-bracket"></i></a>
             </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Location</label>
-                    <input type="text" name="DeviceLocation" id="DeviceLocation" placeholder="e.g. Salem">
-                </div>
-                <div class="form-group">
-                    <label>Time Zone</label>
-                    <select name="Timezone" id="Timezone">
-                        <option value="330">IST (GMT+5:30)</option>
-                        <option value="480">Singapore (GMT+8:00)</option>
-                        <option value="0">UTC (GMT+0:00)</option>
-                        <option value="60">CET (GMT+1:00)</option>
-                        <option value="other">Other...</option>
-                    </select>
-                </div>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">
+                            <i class="fa-solid {% if category == 'success' %}fa-circle-check{% elif category == 'error' %}fa-circle-xmark{% else %}fa-triangle-exclamation{% endif %}"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div id="formError" class="flash error" style="display:none;">
+                <i class="fa-solid fa-circle-xmark"></i>
+                <span id="formErrorText"></span>
             </div>
 
-            <button type="submit" id="submitBtn">Add Device</button>
-        </form>
+            <form method="POST" id="deviceForm" novalidate>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Device Name <span class="required">*</span></label>
+                        <input type="text" name="DeviceFName" id="DeviceFName" placeholder="e.g. Front_Door" maxlength="30" required autofocus>
+                        <div class="field-error" id="DeviceFName-error"><i class="fa-solid fa-circle-exclamation"></i> Device name is required</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Short Name <span class="optional">(optional)</span></label>
+                        <input type="text" name="DeviceSName" id="DeviceSName" placeholder="e.g. FD_Main" maxlength="20">
+                    </div>
+                </div>
 
-        <p class="note">
-            <a href="{{ url_for('logout') }}" class="logout">Logout</a>
-        </p>
+                <div class="form-group">
+                    <label>
+                        Serial Number <span class="required">*</span>
+                        <span class="char-count" id="serialCount">0 / 13</span>
+                    </label>
+                    <input type="text" name="SerialNumber" id="SerialNumber"
+                           placeholder="ESS2101234567"
+                           maxlength="13" minlength="13"
+                           style="font-family:'SF Mono', 'Cascadia Code', 'Consolas', monospace; letter-spacing: 2px; text-transform: uppercase;"
+                           required autocomplete="off">
+                    <div class="hint"><i class="fa-regular fa-circle-info"></i> Exactly 13 alphanumeric characters</div>
+                    <div class="field-error" id="SerialNumber-error"><i class="fa-solid fa-circle-exclamation"></i> Serial number must be exactly 13 characters</div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Location <span class="optional">(optional)</span></label>
+                        <input type="text" name="DeviceLocation" id="DeviceLocation" placeholder="e.g. Salem">
+                    </div>
+                    <div class="form-group">
+                        <label>Time Zone</label>
+                        <select name="Timezone" id="Timezone">
+                            <option value="330">IST (GMT+5:30)</option>
+                            <option value="480">Singapore (GMT+8:00)</option>
+                            <option value="0">UTC (GMT+0:00)</option>
+                            <option value="60">CET (GMT+1:00)</option>
+                            <option value="other">Custom...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit" id="submitBtn">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Register Device</span>
+                </button>
+            </form>
+        </div>
+
+        <div class="card-footer">
+            <span><i class="fa-regular fa-building"></i> ESSL Device Management</span>
+        </div>
     </div>
 
     <script>
@@ -200,7 +515,9 @@
         const serialError = document.getElementById('SerialNumber-error');
         const fnameError = document.getElementById('DeviceFName-error');
         const submitBtn = document.getElementById('submitBtn');
+        const submitBtnText = submitBtn.querySelector('span');
         const formError = document.getElementById('formError');
+        const formErrorText = document.getElementById('formErrorText');
         const overlay = document.getElementById('procOverlay');
         const procProcessing = document.getElementById('procProcessing');
         const procSuccess = document.getElementById('procSuccess');
@@ -222,6 +539,7 @@
         let currentDeviceId = null;
         let currentDeviceName = '';
         let processingCancelled = false;
+        const CIRCUMFERENCE = 251.2;
 
         function trimValue(el) { el.value = el.value.trim(); }
 
@@ -230,13 +548,12 @@
             serialCount.textContent = val.length + ' / 13';
             if (val.length === 0) {
                 serial.className = '';
-                serialError.textContent = 'Serial number is required';
                 serialError.classList.remove('show');
                 return false;
             }
             if (val.length !== 13) {
                 serial.className = 'error';
-                serialError.textContent = 'Serial number must be exactly 13 characters (currently ' + val.length + ')';
+                serialError.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Must be exactly 13 characters (' + val.length + ')';
                 serialError.classList.add('show');
                 return false;
             }
@@ -249,7 +566,6 @@
             const val = fname.value.trim();
             if (val.length === 0) {
                 fname.className = 'error';
-                fnameError.textContent = 'Device name is required';
                 fnameError.classList.add('show');
                 return false;
             }
@@ -274,11 +590,9 @@
         fname.addEventListener('blur', function() { trimValue(this); validateFName(); validateForm(); });
         sname.addEventListener('blur', function() { trimValue(this); });
 
-        const CIRCUMFERENCE = 251.2;
-
         function updateTimer(secs) {
             timerNum.textContent = secs;
-            let offset = CIRCUMFERENCE * (1 - secs / 120);
+            const offset = CIRCUMFERENCE * (1 - secs / 120);
             timerProgress.setAttribute('stroke-dashoffset', offset);
         }
 
@@ -290,12 +604,14 @@
             procProcessing.style.display = 'block';
             procSuccess.style.display = 'none';
             procFail.style.display = 'none';
-            step1Icon.className = 'spinner';
-            step2Icon.className = 'wait';
+            step1Icon.className = 'step-indicator spinner';
+            step2Icon.className = 'step-indicator wait';
             step2Icon.innerHTML = '&#9679;';
             step1Text.textContent = 'Connecting to ESSL server...';
             step2Text.textContent = 'Waiting for device response...';
             procStatus.textContent = 'Checking device connectivity...';
+            timerNum.classList.remove('pulse');
+            timerNum.style.color = '';
             updateTimer(120);
             overlay.classList.add('show');
 
@@ -304,7 +620,6 @@
                 updateTimer(secondsLeft);
                 if (secondsLeft <= 10) {
                     timerNum.classList.add('pulse');
-                    timerNum.style.color = '#ef4444';
                 }
                 if (secondsLeft <= 0) {
                     clearInterval(countdownTimer);
@@ -316,17 +631,17 @@
             pollTimer = setInterval(async function() {
                 if (processingCancelled) return;
                 try {
-                    let r = await fetch('/api/device/' + deviceId + '/status');
-                    let d = await r.json();
+                    const r = await fetch('/api/device/' + deviceId + '/status');
+                    const d = await r.json();
                     if (d.is_online) {
                         clearInterval(pollTimer); pollTimer = null;
                         clearInterval(countdownTimer); countdownTimer = null;
                         showOnline();
                     } else if (secondsLeft < 115) {
-                        step1Icon.className = 'done';
-                        step1Icon.innerHTML = '&#10003;';
+                        step1Icon.className = 'step-indicator done';
+                        step1Icon.innerHTML = '<i class="fa-solid fa-check"></i>';
                         step1Text.textContent = 'Connected to ESSL server';
-                        step2Icon.className = 'spinner';
+                        step2Icon.className = 'step-indicator spinner';
                         step2Icon.innerHTML = '';
                         procStatus.textContent = 'Waiting for device to come online...';
                     }
@@ -337,7 +652,7 @@
         function showOnline() {
             procProcessing.style.display = 'none';
             procSuccess.style.display = 'block';
-            successMsg.textContent = currentDeviceName + ' connected to ESSL server successfully';
+            successMsg.textContent = currentDeviceName + ' is now online';
             deleteDeviceBtn.setAttribute('data-deleted', 'false');
             setTimeout(function() {
                 overlay.classList.remove('show');
@@ -352,7 +667,7 @@
             if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
             procProcessing.style.display = 'none';
             procFail.style.display = 'block';
-            failName.textContent = currentDeviceName + ' — OFFLINE';
+            failName.textContent = currentDeviceName + ' is offline';
             document.getElementById('failStatus').textContent = 'Device did not respond within 120 seconds';
             deleteDeviceBtn.setAttribute('data-device-id', currentDeviceId);
             deleteDeviceBtn.setAttribute('data-deleted', 'false');
@@ -370,7 +685,7 @@
             }
             currentDeviceId = null;
             submitBtn.disabled = false;
-            submitBtn.innerHTML = 'Add Device';
+            submitBtnText.textContent = 'Register Device';
         }
 
         function closeOverlay() {
@@ -382,13 +697,13 @@
                 timerNum.classList.remove('pulse');
                 timerNum.style.color = '';
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = 'Add Device';
+                submitBtnText.textContent = 'Register Device';
             }, 300);
         }
 
         function deleteDevice() {
             if (deleteDeviceBtn.getAttribute('data-deleted') === 'true') return;
-            let did = deleteDeviceBtn.getAttribute('data-device-id');
+            const did = deleteDeviceBtn.getAttribute('data-device-id');
             if (!did) return;
             deleteDeviceBtn.disabled = true;
             deleteDeviceBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Removing...';
@@ -400,7 +715,7 @@
                 })
                 .catch(function() {
                     deleteDeviceBtn.disabled = false;
-                    deleteDeviceBtn.innerHTML = '<i class="fa-solid fa-trash"></i> Remove Device';
+                    deleteDeviceBtn.innerHTML = '<i class="fa-solid fa-trash"></i> Remove';
                 });
         }
 
@@ -412,32 +727,35 @@
 
             formError.style.display = 'none';
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Adding...';
+            submitBtnText.textContent = 'Adding...';
 
             try {
-                let fd = new FormData(form);
-                let r = await fetch('/form', {
+                const fd = new FormData(form);
+                const r = await fetch('/form', {
                     method: 'POST',
                     body: fd,
                     headers: { 'X-Requested-With': 'XMLHttpRequest' }
                 });
-                let data = await r.json();
+                const data = await r.json();
                 if (data.success) {
                     form.reset();
-                    submitBtn.innerHTML = 'Add Device';
+                    submitBtnText.textContent = 'Register Device';
                     showProcessing(data.device_id, data.name);
                     document.getElementById('DeviceFName').focus();
+                    serial.className = '';
+                    fname.className = '';
+                    serialCount.textContent = '0 / 13';
                 } else {
-                    formError.textContent = data.error || 'Error adding device';
-                    formError.style.display = 'block';
+                    formErrorText.textContent = data.error || 'Error adding device';
+                    formError.style.display = 'flex';
                     submitBtn.disabled = false;
-                    submitBtn.innerHTML = 'Add Device';
+                    submitBtnText.textContent = 'Register Device';
                 }
             } catch(e) {
-                formError.textContent = 'Error submitting form';
-                formError.style.display = 'block';
+                formErrorText.textContent = 'Connection error. Please try again.';
+                formError.style.display = 'flex';
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = 'Add Device';
+                submitBtnText.textContent = 'Register Device';
             }
         });
 
